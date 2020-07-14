@@ -11,6 +11,7 @@
 *.out.*
 
 exp/
+libs/kfft
 build/
 find.sh
 Makefile
