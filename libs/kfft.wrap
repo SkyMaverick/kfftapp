@@ -1,0 +1,4 @@
+[wrap-git]
+url = https://github.com/SkyMaverick/kfft.git
+revision = master
+depth = 1

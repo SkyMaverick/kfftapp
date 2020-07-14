@@ -1,0 +1,16 @@
+*.a
+*.o
+*.so
+*.swp
+*.swo
+*.s
+*.s~
+*.log
+*.svg
+~*
+*.out.*
+
+exp/
+build/
+find.sh
+Makefile
