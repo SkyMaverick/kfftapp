@@ -47,6 +47,13 @@ configure_file (
 kfft_dep = dependency('kfft', version: '>=0.5.0',
   fallback: [ 'kfft', 'kfft_lib' ])
 
+if ccid == 'gcc'
+    kfft_cflags += '''
+        -Wno-stringop-overflow
+        -Wno-stringop-truncation
+    '''.split()
+endif
+
 app_dep = [kfft_dep]
 if not (osid == 'windows')
     app_dep += cc.find_library('dl', required: true)
@@ -55,6 +62,23 @@ app_rpath = ':'.join ([
     '$ORIGIN'/'.',
     '$ORIGIN'/'..'
 ])
+
+# Apply all argments
+
+foreach item : kfft_cflags
+    if cc.has_argument (item)
+        add_project_arguments (item, language: 'c')
+    endif
+endforeach
+foreach item : kfft_ldflags
+    if cc.has_link_argument (item)
+        add_project_link_arguments (item, language: 'c')
+    endif
+endforeach
+foreach item : kfft_defs
+    item = ((ccid == 'msvc') ? '/D': '-D') + item
+    add_project_arguments (item, language: 'c')
+endforeach
 
 app_fft = executable (meson.project_name(), 'kfft_main.c',
                        dependencies: app_dep,
