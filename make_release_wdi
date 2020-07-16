@@ -8,8 +8,5 @@ if [ -d ${BUILD_DIR} ]; then
     fi
 fi
 meson . ${BUILD_DIR} \
-    -Dbuildtype=debugoptimized  \
-    -Dbuild_with_lto=true \
-    -Dbuild_with_pgo=true \
-    -Denable_traces=false \
+    -Dbuildtype=debugoptimized \
 && ninja -C ${BUILD_DIR}

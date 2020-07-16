@@ -9,7 +9,4 @@ if [ -d ${BUILD_DIR} ]; then
 fi
 meson . ${BUILD_DIR} \
     -Dbuildtype=release \
-    -Dbuild_with_lto=true \
-    -Dbuild_with_pgo=true \
-    -Denable_traces=false \
 && ninja -C ${BUILD_DIR}
