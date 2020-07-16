@@ -20,15 +20,48 @@ display_flags(kfft_info_t* info) {
             (info->flags & KFFT_INFO_HALF_SCALAR) ? "YES" : "NO");
 }
 
+static void
+display_exts(state_t* st) {
+    fprintf(stdout, "\n%s:\n", "Build with KFFT extensions");
+#if defined(KFFT_2D_ENABLE)
+    KCB_TYPE(eval2_cpx) t1 = KFFT_CALLBACK(st, eval2_cpx);
+    fprintf(stdout, "%s (%s) - %s\n", "Enable 2-dims", "libkfft support",
+            (t1 == NULL) ? "NO" : "YES");
+#else
+    fprintf(stdout, "%s - %s\n", "Enable 2-dims", "NO");
+#endif /* KFFT_2D_ENABLE */
+#if defined(KFFT_SPARSE_ENABLE)
+    KCB_TYPE(eval_sparse_cpx) t2 = KFFT_CALLBACK(st, eval_sparse_cpx);
+    fprintf(stdout, "%s (%s) - %s\n", "Enable sparse", "libkfft support",
+            (t2 == NULL) ? "NO" : "YES");
+#else
+    fprintf(stdout, "%s - %s\n", "Enable sparse", "NO");
+#endif /* KFFT_SPARSE_ENABLE */
+}
+
 #if defined(KFFT_USE_SIMD)
 static void
 display_simd(state_t* st) {
 
     KCB_TYPE(simd_analize) cb_func = KFFT_CALLBACK(st, simd_analize);
     if (cb_func) {
-        fprintf(stdout, "\n%s:\n", "Found CPU extensions");
-
         kfft_simd_t s_info = kfft_simd_analize();
+        fprintf(stdout, "\n%s:\n", "Build with CPU extensions");
+        fprintf(stdout, "%s%s - %s\n", "Enable SSE support",
+    #if defined(KFFT_HAVE_SSE3)
+                " (with SSE3)"
+    #else
+                ""
+    #endif
+                ,
+    #if defined(KFFT_SIMD_SSE_SUPPORT)
+                "YES"
+    #else
+                "NO"
+    #endif
+        );
+
+        fprintf(stdout, "%s:\n", "Found CPU extensions");
     #if defined(KFFT_ARCH_X86)
         //  Misc.
         // clang-format off
@@ -68,28 +101,7 @@ display_simd(state_t* st) {
     #elif defined(KFFT_ARCH_ARM)
             // TODO
     #endif /* ARCH_X86 */
-
-        fprintf(stdout, "\n%s:\n", "Build with CPU extensions");
-        fprintf(stdout, "%s%s - %s\n", "Enable SSE support",
-    #if defined(KFFT_HAVE_SSE3)
-                " (with SSE3)"
-    #else
-                ""
-    #endif
-                ,
-    #if defined(KFFT_SIMD_SSE_SUPPORT)
-                "YES"
-    #else
-                "NO"
-    #endif
-        );
-        fprintf(stdout, "%s - %s\n", "Enable AVX support",
-    #if defined(KFFT_SIMD_AVX_SUPPORT)
-                "YES"
-    #else
-                "NO"
-    #endif
-        );
+        fprintf(stdout, "\n");
     } else
         fprintf(stdout, "%s\n", "Don't found kfft_simd_analize() callback");
 }
@@ -104,6 +116,7 @@ display_info(state_t* st) {
     fprintf(stdout, "Uses libkfft version : %d.%d.%d\n\n", info.vmajor, info.vminor, info.vpatch);
 
     display_flags(&info);
+    display_exts(st);
 #if defined(KFFT_USE_SIMD)
     display_simd(st);
 #endif /* KFFT_USE_SIMD */
