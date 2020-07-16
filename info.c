@@ -39,69 +39,65 @@ display_exts(state_t* st) {
 #endif /* KFFT_SPARSE_ENABLE */
 }
 
+static void
+__display_exts(kfft_simd_t st) {
+    if ((st.arch == HW_ARCH_X86) || (st.arch == HW_ARCH_X64)) {
+        //  Misc.
+        // clang-format off
+        if (kfft_simd_check(st, HW_MMX        )) fprintf (stdout, "%s ", "MMX");
+        if (kfft_simd_check(st, HW_x64        )) fprintf (stdout, "%s ", "x64");
+        if (kfft_simd_check(st, HW_ABM        )) fprintf (stdout, "%s ", "ABM");
+        if (kfft_simd_check(st, HW_RDRAND     )) fprintf (stdout, "%s ", "RDRAND");
+        if (kfft_simd_check(st, HW_BMI1       )) fprintf (stdout, "%s ", "BMI1");
+        if (kfft_simd_check(st, HW_BMI2       )) fprintf (stdout, "%s ", "BMI2");
+        if (kfft_simd_check(st, HW_ADX        )) fprintf (stdout, "%s ", "ADX");
+        if (kfft_simd_check(st, HW_PREFETCHWT1)) fprintf (stdout, "%s ", "PREFETCHWT1");
+        if (kfft_simd_check(st, HW_MPX        )) fprintf (stdout, "%s ", "MPX");
+        if (kfft_simd_check(st, HW_SSE        )) fprintf (stdout, "%s ", "SSE");
+        if (kfft_simd_check(st, HW_SSE2       )) fprintf (stdout, "%s ", "SSE2");
+        if (kfft_simd_check(st, HW_SSE3       )) fprintf (stdout, "%s ", "SSE3");
+        if (kfft_simd_check(st, HW_SSSE3      )) fprintf (stdout, "%s ", "SSSE3");
+        if (kfft_simd_check(st, HW_SSE41      )) fprintf (stdout, "%s ", "SSE41");
+        if (kfft_simd_check(st, HW_SSE42      )) fprintf (stdout, "%s ", "SSE42");
+        if (kfft_simd_check(st, HW_SSE4a      )) fprintf (stdout, "%s ", "SSE4a");
+        if (kfft_simd_check(st, HW_AES        )) fprintf (stdout, "%s ", "AES");
+        if (kfft_simd_check(st, HW_SHA        )) fprintf (stdout, "%s ", "SHA");
+        if (kfft_simd_check(st, HW_AVX        )) fprintf (stdout, "%s ", "AVX");
+        if (kfft_simd_check(st, HW_XOP        )) fprintf (stdout, "%s ", "XOP");
+        if (kfft_simd_check(st, HW_FMA3       )) fprintf (stdout, "%s ", "FMA3");
+        if (kfft_simd_check(st, HW_FMA4       )) fprintf (stdout, "%s ", "FMA4");
+        if (kfft_simd_check(st, HW_AVX2       )) fprintf (stdout, "%s ", "AVX2");
+        if (kfft_simd_check(st, HW_AVX512_F   )) fprintf (stdout, "%s ", "AVX512_F");
+        if (kfft_simd_check(st, HW_AVX512_PF  )) fprintf (stdout, "%s ", "AVX512_PF");
+        if (kfft_simd_check(st, HW_AVX512_ER  )) fprintf (stdout, "%s ", "AVX512_ER");
+        if (kfft_simd_check(st, HW_AVX512_CD  )) fprintf (stdout, "%s ", "AVX512_CD");
+        if (kfft_simd_check(st, HW_AVX512_VL  )) fprintf (stdout, "%s ", "AVX512_VL");
+        if (kfft_simd_check(st, HW_AVX512_BW  )) fprintf (stdout, "%s ", "AVX512_BW");
+        if (kfft_simd_check(st, HW_AVX512_DQ  )) fprintf (stdout, "%s ", "AVX512_DQ");
+        if (kfft_simd_check(st, HW_AVX512_IFMA)) fprintf (stdout, "%s ", "AVX512_IFMA");
+        if (kfft_simd_check(st, HW_AVX512_VBMI)) fprintf (stdout, "%s ", "AVX512_VBMI");
+        // clang-format on
+    }
+    // TODO
+    fprintf(stdout, "\n");
+}
+
 #if defined(KFFT_USE_SIMD)
 static void
 display_simd(state_t* st) {
 
-    KCB_TYPE(simd_analize) cb_func = KFFT_CALLBACK(st, simd_analize);
-    if (cb_func) {
-        kfft_simd_t s_info = kfft_simd_analize();
-        fprintf(stdout, "\n%s:\n", "Build with CPU extensions");
-        fprintf(stdout, "%s%s - %s\n", "Enable SSE support",
-    #if defined(KFFT_HAVE_SSE3)
-                " (with SSE3)"
-    #else
-                ""
-    #endif
-                ,
-    #if defined(KFFT_SIMD_SSE_SUPPORT)
-                "YES"
-    #else
-                "NO"
-    #endif
-        );
+    KCB_TYPE(simd_analize) cb_analize = KFFT_CALLBACK(st, simd_analize);
+    KCB_TYPE(simd_info) cb_info = KFFT_CALLBACK(st, simd_info);
 
+    if (cb_analize && cb_info) {
+        kfft_simd_t s_info = cb_info();
+        fprintf(stdout, "\n%s:\n", "Build with CPU extensions (libkfft)");
+        __display_exts(s_info);
+
+        s_info = cb_analize();
         fprintf(stdout, "%s:\n", "Found CPU extensions");
-    #if defined(KFFT_ARCH_X86)
-        //  Misc.
-        // clang-format off
-        if (kfft_simd_check(s_info, HW_MMX        )) fprintf (stdout, "%s ", "MMX");
-        if (kfft_simd_check(s_info, HW_x64        )) fprintf (stdout, "%s ", "x64");
-        if (kfft_simd_check(s_info, HW_ABM        )) fprintf (stdout, "%s ", "ABM");
-        if (kfft_simd_check(s_info, HW_RDRAND     )) fprintf (stdout, "%s ", "RDRAND");
-        if (kfft_simd_check(s_info, HW_BMI1       )) fprintf (stdout, "%s ", "BMI1");
-        if (kfft_simd_check(s_info, HW_BMI2       )) fprintf (stdout, "%s ", "BMI2");
-        if (kfft_simd_check(s_info, HW_ADX        )) fprintf (stdout, "%s ", "ADX");
-        if (kfft_simd_check(s_info, HW_PREFETCHWT1)) fprintf (stdout, "%s ", "PREFETCHWT1");
-        if (kfft_simd_check(s_info, HW_MPX        )) fprintf (stdout, "%s ", "MPX");
-        if (kfft_simd_check(s_info, HW_SSE        )) fprintf (stdout, "%s ", "SSE");
-        if (kfft_simd_check(s_info, HW_SSE2       )) fprintf (stdout, "%s ", "SSE2");
-        if (kfft_simd_check(s_info, HW_SSE3       )) fprintf (stdout, "%s ", "SSE3");
-        if (kfft_simd_check(s_info, HW_SSSE3      )) fprintf (stdout, "%s ", "SSSE3");
-        if (kfft_simd_check(s_info, HW_SSE41      )) fprintf (stdout, "%s ", "SSE41");
-        if (kfft_simd_check(s_info, HW_SSE42      )) fprintf (stdout, "%s ", "SSE42");
-        if (kfft_simd_check(s_info, HW_SSE4a      )) fprintf (stdout, "%s ", "SSE4a");
-        if (kfft_simd_check(s_info, HW_AES        )) fprintf (stdout, "%s ", "AES");
-        if (kfft_simd_check(s_info, HW_SHA        )) fprintf (stdout, "%s ", "SHA");
-        if (kfft_simd_check(s_info, HW_AVX        )) fprintf (stdout, "%s ", "AVX");
-        if (kfft_simd_check(s_info, HW_XOP        )) fprintf (stdout, "%s ", "XOP");
-        if (kfft_simd_check(s_info, HW_FMA3       )) fprintf (stdout, "%s ", "FMA3");
-        if (kfft_simd_check(s_info, HW_FMA4       )) fprintf (stdout, "%s ", "FMA4");
-        if (kfft_simd_check(s_info, HW_AVX2       )) fprintf (stdout, "%s ", "AVX2");
-        if (kfft_simd_check(s_info, HW_AVX512_F   )) fprintf (stdout, "%s ", "AVX512_F");
-        if (kfft_simd_check(s_info, HW_AVX512_PF  )) fprintf (stdout, "%s ", "AVX512_PF");
-        if (kfft_simd_check(s_info, HW_AVX512_ER  )) fprintf (stdout, "%s ", "AVX512_ER");
-        if (kfft_simd_check(s_info, HW_AVX512_CD  )) fprintf (stdout, "%s ", "AVX512_CD");
-        if (kfft_simd_check(s_info, HW_AVX512_VL  )) fprintf (stdout, "%s ", "AVX512_VL");
-        if (kfft_simd_check(s_info, HW_AVX512_BW  )) fprintf (stdout, "%s ", "AVX512_BW");
-        if (kfft_simd_check(s_info, HW_AVX512_DQ  )) fprintf (stdout, "%s ", "AVX512_DQ");
-        if (kfft_simd_check(s_info, HW_AVX512_IFMA)) fprintf (stdout, "%s ", "AVX512_IFMA");
-        if (kfft_simd_check(s_info, HW_AVX512_VBMI)) fprintf (stdout, "%s ", "AVX512_VBMI");
-    // clang-format on
-    #elif defined(KFFT_ARCH_ARM)
-            // TODO
-    #endif /* ARCH_X86 */
-        fprintf(stdout, "\n");
+        __display_exts(s_info);
+
     } else
         fprintf(stdout, "%s\n", "Don't found kfft_simd_analize() callback");
 }
