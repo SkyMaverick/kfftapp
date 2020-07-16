@@ -1,5 +1,6 @@
 #include "kfa_defs.h"
 
+#if defined(KFFT_2D_ENABLE)
 static unsigned
 work_complex_2d(kfft_cpx* in, state_t* st) {
     KCB_TYPE(eval2_cpx) eval = KFFT_CALLBACK(st, eval2_cpx);
@@ -34,7 +35,9 @@ work_complex_2d(kfft_cpx* in, state_t* st) {
     }
     return KFA_RET_FAIL_INTRNL;
 }
+#endif /* KFFT_2D_ENABLE */
 
+#if defined(KFFT_SPARSE_ENABLE)
 static unsigned
 work_complex_sparse(kfft_cpx* in, state_t* st) {
     KCB_TYPE(eval_sparse_cpx) eval = KFFT_CALLBACK(st, eval_sparse_cpx);
@@ -72,6 +75,7 @@ work_complex_sparse(kfft_cpx* in, state_t* st) {
     }
     return KFA_RET_FAIL_INTRNL;
 }
+#endif /* KFFT_SPARSE_ENABLE */
 
 static unsigned
 work_complex_normal(kfft_cpx* in, state_t* st) {
@@ -112,15 +116,17 @@ unsigned
 work_complex_plan(kfft_scalar* in, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
 
+#if defined(KFFT_SPARSE_ENABLE)
     if (KFA_CHECK(st, SPARSE)) {
         ret = work_complex_sparse((kfft_cpx*)in, st);
-    } else {
+    } else
+#endif /* KFFT_SPARSE_ENABLE */
+#if defined(KFFT_2D_ENABLE)
         if (KFA_CHECK(st, 2D)) {
-            ret = work_complex_2d((kfft_cpx*)in, st);
-        } else {
-            ret = work_complex_normal((kfft_cpx*)in, st);
-        }
-    }
+        ret = work_complex_2d((kfft_cpx*)in, st);
+    } else
+#endif /* KFFT_2D_ENABLE */
+        ret = work_complex_normal((kfft_cpx*)in, st);
     if (ret == KFA_RET_SUCCESS)
         write_stdout(in, st);
 

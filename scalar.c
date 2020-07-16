@@ -1,3 +1,4 @@
+#if defined(KFFT_SPARSE_ENABLE)
 static inline unsigned
 scalar_sparse_forward(kfft_scalar* in, kfft_ssparse_t* plan, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
@@ -73,7 +74,9 @@ work_scalar_sparse(kfft_scalar* in, state_t* st) {
     }
     return KFA_RET_FAIL_INTRNL;
 }
+#endif /* KFFT_SPARSE_ENABLE */
 
+#if defined(KFFT_2D_ENABLE)
 static inline unsigned
 scalar_2d_forward(kfft_scalar* in, kfft_sclr2_t* plan, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
@@ -137,6 +140,8 @@ work_scalar_2d(kfft_scalar* in, state_t* st) {
     }
     return KFA_RET_FAIL_INTRNL;
 }
+#endif /* KFFT_2D_ENABLE */
+
 static inline unsigned
 scalar_normal_forward(kfft_scalar* in, kfft_sclr_t* plan, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
@@ -207,15 +212,17 @@ unsigned
 work_scalar_plan(kfft_scalar* in, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
 
+#if defined(KFFT_SPARSE_ENABLE)
     if (KFA_CHECK(st, SPARSE)) {
         ret = work_scalar_sparse(in, st);
-    } else {
+    } else
+#endif /* KFFT_SPARSE_ENABLE */
+#if defined(KFFT_2D_ENABLE)
         if (KFA_CHECK(st, 2D)) {
-            ret = work_scalar_2d(in, st);
-        } else {
-            ret = work_scalar_normal(in, st);
-        }
-    }
+        ret = work_scalar_2d(in, st);
+    } else
+#endif /* KFFT_2D_ENABLE */
+        ret = work_scalar_normal(in, st);
 
     return ret;
 }

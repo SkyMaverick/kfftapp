@@ -36,6 +36,7 @@ calculate_io(state_t* st, size_t in_size) {
     }
 }
 
+#if defined(KFFT_2D_ENABLE)
 static int
 parse_2d_arg(char* arg, state_t* st) {
     int ret = atoi(arg);
@@ -45,7 +46,9 @@ parse_2d_arg(char* arg, state_t* st) {
     }
     return 1;
 }
+#endif /* KFFT_2D_ENABLE */
 
+#if defined(KFFT_SPARSE_ENABLE)
 static int
 parse_sparse_arg(char* arg, state_t* st) {
     size_t olen = strlen(arg);
@@ -66,6 +69,7 @@ parse_sparse_arg(char* arg, state_t* st) {
     free(buf);
     return 0;
 }
+#endif /* KFFT_SPARSE_ENABLE */
 
 #if !defined(KFFT_OS_WINDOWS)
 int
@@ -151,6 +155,12 @@ post_process_analize(state_t* st) {
     return true;
 }
 
+#define EXIT_WITH_NOSUPPORT(C)                                                                     \
+    do {                                                                                           \
+        fprintf(stderr, "Usupported %c argument on this build", C);                                \
+        exit(KFA_RET_FAIL_ARGS);                                                                   \
+    } while (0)
+
 static kfft_scalar*
 cmd_line_parse(int argc, char* argv[], state_t* st) {
     kfft_scalar* ret = NULL;
@@ -174,16 +184,24 @@ cmd_line_parse(int argc, char* argv[], state_t* st) {
             st->mode |= KFA_MODE_SCALAR;
             break;
         case 'd': {
+#if defined(KFFT_SPARSE_ENABLE)
             if (parse_sparse_arg(optarg, st))
                 return NULL;
             st->mode |= KFA_MODE_SPARSE;
             break;
+#else
+            EXIT_WITH_NOSUPPORT('d');
+#endif /* KFFT_SPARSE_ENABLE */
         }
         case 'x':
+#if defined(KFFT_2D_ENABLE)
             if (parse_2d_arg(optarg, st))
                 return NULL;
             st->mode |= KFA_MODE_2D;
             break;
+#else
+            EXIT_WITH_NOSUPPORT('x');
+#endif /* KFFT_2D_ENABLE */
         case 'v':
             fprintf(stdout, "%d.%d.%d\n", VER_MAJOR, VER_MINOR, VER_PATCH);
             exit(0);

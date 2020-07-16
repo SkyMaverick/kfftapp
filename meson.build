@@ -5,7 +5,6 @@ project ('kfft', 'c',
             'c_std=gnu11',
             'warning_level=2',
             'strip=true',
-            'b_pie=true'
          ],
          subproject_dir: 'libs',
          meson_version: '>=0.52')
@@ -45,7 +44,7 @@ configure_file (
     }
 )
 
-kfft_dep = dependency('kfft', version: '>=' + meson.project_version(),
+kfft_dep = dependency('kfft', version: '>=0.5.0',
   fallback: [ 'kfft', 'kfft_lib' ])
 
 app_dep = [kfft_dep]
