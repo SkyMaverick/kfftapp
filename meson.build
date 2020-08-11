@@ -1,5 +1,5 @@
 project ('kfft', 'c',
-         version: '0.5.1',
+         version: '0.7.1',
          license: 'Zlib',
          default_options:[
             'c_std=gnu11',
@@ -44,7 +44,7 @@ configure_file (
     }
 )
 
-kfft_dep = dependency('kfft', version: '>=0.5.0',
+kfft_dep = dependency('kfft', version: '>=0.7.0',
   fallback: [ 'kfft', 'kfft_lib' ])
 
 if ccid == 'gcc'

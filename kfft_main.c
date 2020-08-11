@@ -34,7 +34,7 @@ main(int argc, char* argv[]) {
         } else {
             display_help();
         }
-        unload_kfft_core(k_state);
+        //        unload_kfft_core(k_state);
     }
     free(k_state);
     return ret;

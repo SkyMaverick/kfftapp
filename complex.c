@@ -10,7 +10,7 @@ work_complex_2d(kfft_cpx* in, state_t* st) {
     if ((eval == NULL) || (config == NULL) || (shift == NULL))
         return KFA_RET_FAIL_UNREAL;
 
-    kfft_comp2_t* plan = config(st->dims.x, st->dims.y, sm2kfl(st), NULL, NULL);
+    kfft_plan_c2d* plan = config(st->dims.x, st->dims.y, sm2kfl(st), NULL, NULL);
     if (plan) {
         unsigned ret;
         if (KFA_CHECK(st, SHIFT)) {
@@ -47,7 +47,7 @@ work_complex_sparse(kfft_cpx* in, state_t* st) {
     if ((eval == NULL) || (config == NULL) || (shift == NULL))
         return KFA_RET_FAIL_UNREAL;
 
-    kfft_csparse_t* plan =
+    kfft_plan_csparse* plan =
         config(st->in_count, sm2kfl(st), st->sparse.dx, st->sparse.sx, NULL, NULL);
     if (plan) {
         unsigned ret;
@@ -86,7 +86,7 @@ work_complex_normal(kfft_cpx* in, state_t* st) {
     if ((eval == NULL) || (config == NULL) || (shift == NULL))
         return KFA_RET_FAIL_UNREAL;
 
-    kfft_comp_t* plan = config(st->in_count, sm2kfl(st), NULL, NULL);
+    kfft_plan_cpx* plan = config(st->in_count, sm2kfl(st), NULL, NULL);
     if (plan) {
         unsigned ret;
         if (KFA_CHECK(st, SHIFT)) {

@@ -1,6 +1,6 @@
 #if defined(KFFT_SPARSE_ENABLE)
 static inline unsigned
-scalar_sparse_forward(kfft_scalar* in, kfft_ssparse_t* plan, state_t* st) {
+scalar_sparse_forward(kfft_scalar* in, kfft_plan_ssparse* plan, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
 
     KCB_TYPE(eval_sparse_scalar) eval = KFFT_CALLBACK(st, eval_sparse_scalar);
@@ -30,7 +30,7 @@ scalar_sparse_forward(kfft_scalar* in, kfft_ssparse_t* plan, state_t* st) {
     return ret;
 }
 static inline unsigned
-scalar_sparse_inverse(kfft_scalar* in, kfft_ssparse_t* plan, state_t* st) {
+scalar_sparse_inverse(kfft_scalar* in, kfft_plan_ssparse* plan, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
 
     KCB_TYPE(evali_sparse_scalar) evali = KFFT_CALLBACK(st, evali_sparse_scalar);
@@ -64,7 +64,7 @@ work_scalar_sparse(kfft_scalar* in, state_t* st) {
     if (config == NULL)
         return KFA_RET_FAIL_UNREAL;
 
-    kfft_ssparse_t* plan =
+    kfft_plan_ssparse* plan =
         config(st->in_count, sm2kfl(st), st->sparse.dx, st->sparse.sx, NULL, NULL);
     if (plan) {
         unsigned ret = (KFA_CHECK(st, INVERSE)) ? scalar_sparse_inverse(in, plan, st)
@@ -78,7 +78,7 @@ work_scalar_sparse(kfft_scalar* in, state_t* st) {
 
 #if defined(KFFT_2D_ENABLE)
 static inline unsigned
-scalar_2d_forward(kfft_scalar* in, kfft_sclr2_t* plan, state_t* st) {
+scalar_2d_forward(kfft_scalar* in, kfft_plan_s2d* plan, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
 
     KCB_TYPE(eval2_scalar) eval = KFFT_CALLBACK(st, eval2_scalar);
@@ -102,7 +102,7 @@ scalar_2d_forward(kfft_scalar* in, kfft_sclr2_t* plan, state_t* st) {
     return ret;
 }
 static inline unsigned
-scalar_2d_inverse(kfft_scalar* in, kfft_sclr2_t* plan, state_t* st) {
+scalar_2d_inverse(kfft_scalar* in, kfft_plan_s2d* plan, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
 
     KCB_TYPE(evali2_scalar) evali = KFFT_CALLBACK(st, evali2_scalar);
@@ -131,7 +131,7 @@ work_scalar_2d(kfft_scalar* in, state_t* st) {
     if (config == NULL)
         return KFA_RET_FAIL_UNREAL;
 
-    kfft_sclr2_t* plan = config(st->dims.x, st->dims.y, sm2kfl(st), NULL, NULL);
+    kfft_plan_s2d* plan = config(st->dims.x, st->dims.y, sm2kfl(st), NULL, NULL);
     if (plan) {
         unsigned ret = (KFA_CHECK(st, INVERSE)) ? scalar_2d_inverse(in, plan, st)
                                                 : scalar_2d_forward(in, plan, st);
@@ -143,7 +143,7 @@ work_scalar_2d(kfft_scalar* in, state_t* st) {
 #endif /* KFFT_2D_ENABLE */
 
 static inline unsigned
-scalar_normal_forward(kfft_scalar* in, kfft_sclr_t* plan, state_t* st) {
+scalar_normal_forward(kfft_scalar* in, kfft_plan_sclr* plan, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
 
     KCB_TYPE(eval_scalar) eval = KFFT_CALLBACK(st, eval_scalar);
@@ -167,7 +167,7 @@ scalar_normal_forward(kfft_scalar* in, kfft_sclr_t* plan, state_t* st) {
     return ret;
 }
 static inline unsigned
-scalar_normal_inverse(kfft_scalar* in, kfft_sclr_t* plan, state_t* st) {
+scalar_normal_inverse(kfft_scalar* in, kfft_plan_sclr* plan, state_t* st) {
     unsigned ret = KFA_RET_FAIL_INTRNL;
 
     KCB_TYPE(evali_scalar) evali = KFFT_CALLBACK(st, evali_scalar);
@@ -198,7 +198,7 @@ work_scalar_normal(kfft_scalar* in, state_t* st) {
     if (config == NULL)
         return KFA_RET_FAIL_UNREAL;
 
-    kfft_sclr_t* plan = config(st->in_count, sm2kfl(st), NULL, NULL);
+    kfft_plan_sclr* plan = config(st->in_count, sm2kfl(st), NULL, NULL);
     if (plan) {
         unsigned ret = (KFA_CHECK(st, INVERSE)) ? scalar_normal_inverse(in, plan, st)
                                                 : scalar_normal_forward(in, plan, st);
